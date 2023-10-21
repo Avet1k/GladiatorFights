@@ -3,46 +3,64 @@ class Program
 {
     static void Main(string[] args)
     {
-        Game newGame = new Game();
+        ConsoleLogger consoleLogger = new ConsoleLogger();
+        Game newGame = new Game(consoleLogger);
         
         newGame.PickWarriors();
         newGame.Fight();
     }
 }
 
-static class Logger
+interface ILogger
 {
-    public static void ShowTakenDamage(string name, int dealtDamage)
+    void ShowTakenDamage(string name, int dealtDamage);
+
+    void ShowStats(string name, int health, int damage, int armor);
+
+    void ShowUsingPaladinAbility(string name, int healValue);
+
+    void ShowUsingDuelistAbility(string name);
+
+    void ShowUsingMageAbility(string name, int manaPotionValue);
+
+    void ShowUsingVampireAbility(string name, int healthToRestore);
+
+    void ShowMageStats(string name, int health, int damage, int armor, int mana);
+}
+
+class ConsoleLogger : ILogger
+{
+    public void ShowTakenDamage(string name, int dealtDamage)
     {
         Console.WriteLine($"Бойцу {name} нанесли {dealtDamage} урона!");
     }
     
-    public static void ShowStats(string name, int health, int damage, int armor)
+    public void ShowStats(string name, int health, int damage, int armor)
     {
         Console.WriteLine($"{name}\nОЗ: {health}   УР: {damage}   БР: {armor}");
     }
 
-    public static void ShowUsingPaladinAbility(string name, int healValue)
+    public void ShowUsingPaladinAbility(string name, int healValue)
     {
         Console.WriteLine($"Боец {name} вылечил себе {healValue} ОЗ");
     }
     
-    public static void ShowUsingDuelistAbility(string name)
+    public void ShowUsingDuelistAbility(string name)
     {
         Console.WriteLine($"Боец {name} увернулся от удара!");
     }
 
-    public static void ShowUsingMageAbility(string name, int manaPotionValue)
+    public void ShowUsingMageAbility(string name, int manaPotionValue)
     {
         Console.WriteLine($"Боец {name} восстановил {manaPotionValue} маны.");
     }
 
-    public static void ShowUsingVampireAbility(string name, int healthToRestore)
+    public void ShowUsingVampireAbility(string name, int healthToRestore)
     {
         Console.WriteLine($"Боец {name} восстановил {healthToRestore} ОЗ");
     }
 
-    public static void ShowMageStats(string name, int health, int damage, int armor, int mana)
+    public void ShowMageStats(string name, int health, int damage, int armor, int mana)
     {
         Console.WriteLine($"{name}\nОЗ: {health}   УР: {damage}   БР: {armor}   ОМ: {mana}");
     }
@@ -50,12 +68,15 @@ static class Logger
 
 abstract class Warrior
 {
-    protected Warrior(string name, int damage, int health, int armor)
+    protected ConsoleLogger Logger;
+    
+    protected Warrior(string name, int damage, int health, int armor, ConsoleLogger logger)
     {
         Name = name;
         Health = health;
         Damage = damage;
         Armor = armor;
+        Logger = logger;
     }
 
     public string Name { get; }
@@ -93,7 +114,8 @@ class Paladin : Warrior
     private int _cooldown = 5;
     private int _roundCount;
 
-    public Paladin() : base(name: "Ашот Железный", damage: 50, health: 500, armor: 120)
+    public Paladin(ConsoleLogger consoleLogger) : base(name: "Ашот Железный",
+        damage: 50, health: 500, armor: 120, consoleLogger)
     {
         float percetageConverter = 100f;
         
@@ -112,7 +134,7 @@ class Paladin : Warrior
 
     public override Warrior Create()
     {
-        return new Paladin();
+        return new Paladin(Logger);
     }
 
     private void Ability()
@@ -129,7 +151,8 @@ class Archer : Warrior
     private int _critMultiplier = 3;
     private Random _random = new();
     
-    public Archer() : base(name: "Айцемник", damage: 60, health: 300, armor: 90)
+    public Archer(ConsoleLogger consoleLogger) : base(name: "Айцемник", damage: 60, health: 300, armor: 90,
+        consoleLogger)
     {
     }
     
@@ -143,7 +166,7 @@ class Archer : Warrior
 
     public override Warrior Create()
     {
-        return new Archer();
+        return new Archer(Logger);
     }
 }
 
@@ -152,7 +175,8 @@ class Duelist : Warrior
     private int _dodgeChance = 3;
     private Random _random = new();
     
-    public Duelist() : base(name: "Борис Бритва", damage: 55, health: 400, armor: 80)
+    public Duelist(ConsoleLogger consoleLogger) : base(name: "Борис Бритва", damage: 55, health: 400, armor: 80,
+        consoleLogger)
     {
     }
 
@@ -166,7 +190,7 @@ class Duelist : Warrior
 
     public override Warrior Create()
     {
-        return new Duelist();
+        return new Duelist(Logger);
     }
 }
 
@@ -176,7 +200,8 @@ class Mage : Warrior
     private int _manaPotionValue = 60;
     private int _mana;
     
-    public Mage() : base(name: "Анаит Просветлённая", damage: 100, health: 400, armor: 95)
+    public Mage(ConsoleLogger consoleLogger) : base(name: "Анаит Просветлённая", damage: 100, health: 400, armor: 95,
+        consoleLogger)
     {
         _mana = 100;
     }
@@ -195,7 +220,7 @@ class Mage : Warrior
 
     public override Warrior Create()
     {
-        return new Mage();
+        return new Mage(Logger);
     }
 
     public override void ShowStats()
@@ -209,7 +234,8 @@ class Vampire : Warrior
     private int _maxHealth;
     private int _healthRestorePercentage = 30;
 
-    public Vampire() : base(name: "Аракская Ночница", damage: 60, health: 400, armor: 50)
+    public Vampire(ConsoleLogger consoleLogger) : base(name: "Аракская Ночница", damage: 60, health: 400, armor: 50,
+        consoleLogger)
     {
         _maxHealth = Health;
     }
@@ -225,7 +251,7 @@ class Vampire : Warrior
 
     public override Warrior Create()
     {
-        return new Vampire();
+        return new Vampire(Logger);
     }
 
     private void RestoreHealth(int dealtDamage)
@@ -248,15 +274,15 @@ class Game
     private Warrior _firstWarrior;
     private Warrior _secondWarrior;
     
-    public Game()
+    public Game(ConsoleLogger consoleLogger)
     {
         _warriorsExamples = new List<Warrior>()
         {
-            new Paladin(),
-            new Archer(),
-            new Duelist(),
-            new Mage(),
-            new Vampire()
+            new Paladin(consoleLogger),
+            new Archer(consoleLogger),
+            new Duelist(consoleLogger),
+            new Mage(consoleLogger),
+            new Vampire(consoleLogger)
         };
     }
     
