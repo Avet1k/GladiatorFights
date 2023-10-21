@@ -41,6 +41,11 @@ static class Logger
     {
         Console.WriteLine($"Боец {name} восстановил {healthToRestore} ОЗ");
     }
+
+    public static void ShowMageStats(string name, int health, int damage, int armor, int mana)
+    {
+        Console.WriteLine($"{name}\nОЗ: {health}   УР: {damage}   БР: {armor}   ОМ: {mana}");
+    }
 }
 
 abstract class Warrior
@@ -195,8 +200,7 @@ class Mage : Warrior
 
     public override void ShowStats()
     {
-        string stats = $"{Name}\nОЗ: {Health}   УР: {Damage}   БР: {Armor}   ОМ: {_mana}";
-        Console.WriteLine(stats);
+        Logger.ShowMageStats(Name, Health, Damage, Armor, _mana);
     }
 }
 
@@ -302,7 +306,7 @@ class Game
             
             Console.WriteLine();
         }
-        
+       
         return _warriorsExamples[warriorIndex - 1].Create();
     }
     
