@@ -3,8 +3,10 @@ class Program
 {
     static void Main(string[] args)
     {
-        ConsoleLogger consoleLogger = new ConsoleLogger();
+        ConsoleLogger consoleLogger = new();
         Game newGame = new Game(consoleLogger);
+        
+        List<int> a = new();
         
         newGame.PickWarriors();
         newGame.Fight();
@@ -68,9 +70,9 @@ class ConsoleLogger : ILogger
 
 abstract class Warrior
 {
-    protected ConsoleLogger Logger;
+    protected ILogger Logger;
     
-    protected Warrior(string name, int damage, int health, int armor, ConsoleLogger logger)
+    protected Warrior(string name, int damage, int health, int armor, ILogger logger)
     {
         Name = name;
         Health = health;
@@ -114,7 +116,7 @@ class Paladin : Warrior
     private int _cooldown = 5;
     private int _roundCount;
 
-    public Paladin(ConsoleLogger consoleLogger) : base(name: "Ашот Железный",
+    public Paladin(ILogger consoleLogger) : base(name: "Ашот Железный",
         damage: 50, health: 500, armor: 120, consoleLogger)
     {
         float percetageConverter = 100f;
@@ -151,7 +153,7 @@ class Archer : Warrior
     private int _critMultiplier = 3;
     private Random _random = new();
     
-    public Archer(ConsoleLogger consoleLogger) : base(name: "Айцемник", damage: 60, health: 300, armor: 90,
+    public Archer(ILogger consoleLogger) : base(name: "Айцемник", damage: 60, health: 300, armor: 90,
         consoleLogger)
     {
     }
@@ -175,7 +177,7 @@ class Duelist : Warrior
     private int _dodgeChance = 3;
     private Random _random = new();
     
-    public Duelist(ConsoleLogger consoleLogger) : base(name: "Борис Бритва", damage: 55, health: 400, armor: 80,
+    public Duelist(ILogger consoleLogger) : base(name: "Борис Бритва", damage: 55, health: 400, armor: 80,
         consoleLogger)
     {
     }
@@ -200,7 +202,7 @@ class Mage : Warrior
     private int _manaPotionValue = 60;
     private int _mana;
     
-    public Mage(ConsoleLogger consoleLogger) : base(name: "Анаит Просветлённая", damage: 100, health: 400, armor: 95,
+    public Mage(ILogger consoleLogger) : base(name: "Анаит Просветлённая", damage: 100, health: 400, armor: 95,
         consoleLogger)
     {
         _mana = 100;
@@ -234,7 +236,7 @@ class Vampire : Warrior
     private int _maxHealth;
     private int _healthRestorePercentage = 30;
 
-    public Vampire(ConsoleLogger consoleLogger) : base(name: "Аракская Ночница", damage: 60, health: 400, armor: 50,
+    public Vampire(ILogger consoleLogger) : base(name: "Аракская Ночница", damage: 60, health: 400, armor: 50,
         consoleLogger)
     {
         _maxHealth = Health;
@@ -274,7 +276,7 @@ class Game
     private Warrior _firstWarrior;
     private Warrior _secondWarrior;
     
-    public Game(ConsoleLogger consoleLogger)
+    public Game(ILogger consoleLogger)
     {
         _warriorsExamples = new List<Warrior>()
         {
